@@ -1,0 +1,80 @@
+@HOST = http://localhost:8080
+
+POST {{HOST}}/managers HTTP/1.1
+Content-Type: application/json
+
+{
+  "firstName": null,
+  "lastName": "Segundo nome",
+  "email": "example4@gmail.com",
+  "password": "example"
+}
+###
+
+POST {{HOST}}/auth/managers HTTP/1.1
+Content-Type: application/json
+
+{
+  "email": "example@gmail.com",
+  "password": "example"
+}
+###
+
+POST {{HOST}}/auth/clients HTTP/1.1
+Content-Type: application/json
+
+{
+  "email": "exampl3@gmail.com",
+  "password": "example"
+}
+###
+
+POST {{HOST}}/auth/select-store HTTP/1.1
+Content-Type: application/json
+
+{
+  "storeId": "1a3d0f55-c55b-4e7e-8dcf-e7c776ee28a4"
+}
+###
+
+POST {{HOST}}/clients HTTP/1.1
+Content-Type: application/json
+
+{
+  "firstName": "Primeiro",
+  "lastName": "Segundo nome",
+  "email": "exampl3@gmail.com",
+  "password": "example"
+}
+###
+
+POST {{HOST}}/stores HTTP/1.1
+Content-Type: application/json
+
+{
+  "name": "minha loja"
+}
+###
+
+GET {{HOST}}/stores/my HTTP/1.1
+###
+
+GET {{HOST}}/stores/3 HTTP/1.1
+###
+
+POST {{HOST}}/products HTTP/1.1
+Content-Type: application/json
+
+{
+  "name": "teste",
+  "description": "teste",
+  "price": 10,
+  "storeId": "teste"
+}
+
+###
+
+GET {{HOST}}/auth/managers HTTP/1.1
+
+###
+GET {{HOST}}/auth/clients HTTP/1.1
