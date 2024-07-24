@@ -14,12 +14,11 @@ import { Roles } from 'src/utils/roles';
 import { Response } from 'express';
 import { AuthDto } from './dtos/auth.dto';
 import { ClientsService } from 'src/clients/clients.service';
-import { Store } from 'src/stores/entities/store.entity';
 import { StoresService } from 'src/stores/stores.service';
 
 type OptionsToGenerateJwt = {
   payload: any;
-  option: 'accessToken' | 'refreshToken';
+  expiresIn: string;
 };
 
 type SelectStoreAndSetInResponseProps = {
@@ -39,36 +38,57 @@ export class AuthService {
   ) {}
 
   private expiresWithOption = {
-    ['accessToken']: this.jwtConfig.getAccessTokenExpiration(),
-    ['refreshToken']: this.jwtConfig.getRefreshTokenExpiration(),
+    accessToken: this.jwtConfig.getAccessTokenExpiration(),
+    longExpiration: this.jwtConfig.getRefreshTokenExpiration(),
   };
 
   private logger: Logger = new Logger(AuthService.name);
   private roles = new Roles();
 
-  async generateJwt({ payload, option }: OptionsToGenerateJwt): Promise<string> {
+  public async generateJwt({ payload, expiresIn }: OptionsToGenerateJwt): Promise<string> {
     const jwt = await this.jwtService.signAsync(payload, {
-      expiresIn: this.expiresWithOption[option],
+      expiresIn: expiresIn,
     });
 
     return jwt;
   }
 
-  async selectStore({
+  private async getAccessAndRefreshToken<T = any>(payload: T) {
+    const accessToken = await this.generateJwt({
+      expiresIn: this.jwtConfig.getAccessTokenExpiration(),
+      payload,
+    });
+
+    const refreshToken = await this.generateJwt({
+      expiresIn: this.jwtConfig.getRefreshTokenExpiration(),
+      payload,
+    });
+
+    return {
+      accessToken,
+      refreshToken,
+    };
+  }
+
+  public async selectStore({
     storeId,
     response,
     managerId,
   }: SelectStoreAndSetInResponseProps): Promise<any> {
     try {
-      const stores: Store[] = await this.storesService.findByManagerId(managerId);
+      const stores = await this.storesService.findByManagerId(managerId);
       if (!stores[0]?.id) throw new BadGatewayException('Nenhuma loja disponível!');
 
-      const selectedStore = stores?.filter((store: Store) => store.id === storeId)?.[0] || null;
-      if (!selectedStore?.id) throw new BadGatewayException('Loja não encontrada!');
+      const searchStoreInResponseOfDatabase = () =>
+        stores?.filter((store: any) => store?.id === storeId)?.[0] || null;
+      const selectedStore = searchStoreInResponseOfDatabase();
+
+      if (!selectedStore?.id || selectedStore?.managerId !== managerId)
+        throw new BadGatewayException('Loja não encontrada!');
 
       const jwtStore: string = await this.generateJwt({
         payload: { id: selectedStore.id },
-        option: 'refreshToken',
+        expiresIn: this.expiresWithOption.longExpiration,
       });
 
       response.cookie('_store', jwtStore, {
@@ -76,7 +96,7 @@ export class AuthService {
         sameSite: 'strict',
         path: '/',
       });
-      
+
       return selectedStore;
     } catch (error) {
       this.logger.error(error);
@@ -84,7 +104,7 @@ export class AuthService {
     }
   }
 
-  async authClient({ email, password }: AuthDto) {
+  public async authClient({ email, password }: AuthDto) {
     const clientInDatabase = await this.clientsService.findByEmail(email);
 
     const comparePassword = !!(await compareHash(password, clientInDatabase.password));
@@ -94,8 +114,7 @@ export class AuthService {
       const { id, email } = clientInDatabase;
       const payload: Session = { id, email, role: this.roles.clientRole };
 
-      const accessToken = await this.generateJwt({ payload, option: 'accessToken' });
-      const refreshToken = await this.generateJwt({ payload, option: 'refreshToken' });
+      const { accessToken, refreshToken } = await this.getAccessAndRefreshToken<Session>(payload);
 
       return {
         accessToken,
@@ -106,7 +125,7 @@ export class AuthService {
     }
   }
 
-  async authManager({ email, password }: AuthDto) {
+  public async authManager({ email, password }: AuthDto) {
     const findOneManagerByEmail = await this.managersService.findOneByEmail(email);
     if (!findOneManagerByEmail?.id) throw new NotFoundException('Usuário não existe!');
 
@@ -117,8 +136,7 @@ export class AuthService {
       const { id, email } = findOneManagerByEmail;
       const payload: Session = { id, email, role: this.roles.managerRole };
 
-      const accessToken = await this.generateJwt({ payload, option: 'accessToken' });
-      const refreshToken = await this.generateJwt({ payload, option: 'refreshToken' });
+      const { accessToken, refreshToken } = await this.getAccessAndRefreshToken<Session>(payload);
 
       return {
         accessToken,

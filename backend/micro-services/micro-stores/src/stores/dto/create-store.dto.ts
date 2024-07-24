@@ -1,4 +1,4 @@
-export class CreateStoreInterface {
+export class CreateStoreDto {
   name: string
   managerId: string;
 }

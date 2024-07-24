@@ -16,7 +16,7 @@ export type Session = {
   role: Role;
 };
 
-export type StorePayload = {
+export type SessionStore = {
   id: string;
 };
 

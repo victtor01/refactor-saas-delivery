@@ -16,15 +16,22 @@ export class ImplementsStoreRepository implements StoreRepository {
     private readonly storeRepo: Repository<Store>,
   ) {}
 
-  async save(store: Store): Promise<Store> {
+  public async save(store: { id: string; name: string }): Promise<Store> {
     return await this.storeRepo.save(store);
   }
 
-  async findByManagerId(managerId: string): Promise<Store[]> {
+  public async findByManagerId(managerId: string): Promise<Store[]> {
     return await this.storeRepo.findBy({ managerId });
   }
 
-  async findAllLimit({ initial, limit }: FindAllWithLimit): Promise<Store[]> {
+  public async findById(storeId: string): Promise<Store> {
+    return await this.storeRepo.findOneBy({ id: storeId });
+  }
+
+  public async findAllLimit({
+    initial,
+    limit,
+  }: FindAllWithLimit): Promise<Store[]> {
     return await this.storeRepo.find({
       skip: initial,
       take: limit,

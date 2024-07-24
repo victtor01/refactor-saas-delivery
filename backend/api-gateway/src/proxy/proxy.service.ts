@@ -56,21 +56,25 @@ export class ProxyService {
   }
 
   public async sendMessage<T = any>({ timeOut = 5000, ...props }: SendMessageProps): Promise<T> {
-    const { queue, data, pattern: action, callbackError } = props;
-    const client = await this.configureToQueue(queue);
+    try {
+      const { queue, data, pattern: action, callbackError } = props;
+      const client = await this.configureToQueue(queue);
 
-    const response =
-      (await firstValueFrom(
-        client.send(action, data).pipe(
-          timeout(timeOut),
-          catchError((err: HttpException) => {
-            if (!callbackError) throw new BadGatewayException(err.message);
-            return callbackError(err);
-          }),
-        ),
-      )) || null;
+      const response =
+        (await firstValueFrom(
+          client.send(action, data).pipe(
+            timeout(timeOut),
+            catchError((err: HttpException) => {
+              if (!callbackError) throw new BadGatewayException(err.message);
+              return callbackError(err);
+            }),
+          ),
+        )) || null;
 
-    return response;
+      return response;
+    } catch (error) {
+      throw new BadRequestException(error.message)
+    }
   }
 
   public confirmMessage(context: RmqContext) {

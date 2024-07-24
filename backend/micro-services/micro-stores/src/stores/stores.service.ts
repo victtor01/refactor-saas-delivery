@@ -4,7 +4,7 @@ import {
   Logger,
   UnauthorizedException,
 } from '@nestjs/common';
-import { CreateStoreInterface } from './dto/create-store.dto';
+import { CreateStoreDto } from './dto/create-store.dto';
 import { StoreRepository } from './repositories/store-repository';
 import { Store } from './entities/store.entity';
 
@@ -14,7 +14,7 @@ export class StoresService {
 
   private limitPages = 2;
 
-  async create({ name, managerId }: CreateStoreInterface) {
+  public async create({ name, managerId }: CreateStoreDto) {
     const stores = await this.findByManagerId(managerId);
 
     if (stores?.length >= 5)
@@ -30,7 +30,7 @@ export class StoresService {
     }
   }
 
-  async findByManagerId(managerId: string) {
+  public async findByManagerId(managerId: string) {
     try {
       const stores: Store[] = await this.storesRepo.findByManagerId(managerId);
 
@@ -42,7 +42,39 @@ export class StoresService {
     }
   }
 
-  async findWithLimit(page: number) {
+  public async update({ id, name, managerId }: Store) {
+    if (!managerId) throw new BadRequestException('Parâmetros faltando!');
+
+    const store = await this.findOneById(id);
+    if (!store?.id || store?.managerId !== managerId) {
+      throw new UnauthorizedException(
+        'Você não pode atualizar oss dados dessa loja!',
+      );
+    }
+
+    try {
+      const store = new Store({ name, managerId }, id);
+      const udpated: Store = await this.storesRepo.save(store);
+
+      return udpated;
+    } catch (error) {
+      throw new BadRequestException(
+        'Houve um erro ao tentar encontrar as lojas!',
+      );
+    }
+  }
+
+  public async findOneById(storeId: string): Promise<Store> {
+    try {
+      const store = await this.storesRepo.findById(storeId);
+
+      return store;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  public async findWithLimit(page: number) {
     const initialPage = page === 1 ? page : (page - 1) * this.limitPages;
 
     try {

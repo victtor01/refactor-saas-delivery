@@ -4,6 +4,6 @@ export class CreateProductDto {
   price: number;
   photo?: string;
   quantity: number;
-  storeId: string;
   managerId: string;
+  storeId: string;
 }

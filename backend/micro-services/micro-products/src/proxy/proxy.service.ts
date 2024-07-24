@@ -91,7 +91,18 @@ export class ProxyService {
     }
   }
 
-  configureProxy(queue: string): ClientProxy {
+  public async rejectMessage(context: RmqContext) {
+    try {
+      const originalMsg = context.getMessage();
+      const channel = await context.getChannelRef();
+
+      await channel.nack(originalMsg, false, false);
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  public configureProxy(queue: string): ClientProxy {
     return this.configure(queue);
   }
 }

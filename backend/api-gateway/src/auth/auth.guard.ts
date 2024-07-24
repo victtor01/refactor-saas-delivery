@@ -18,6 +18,7 @@ import {
 } from 'src/utils/decorators';
 import { Session } from './constants';
 import { Roles } from 'src/utils/roles';
+import { accessTokenCookie, refreshTokenCookie } from 'src/cookies';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -72,7 +73,7 @@ export class AuthGuard implements CanActivate {
   }
 
   private setNewTokenInCookie(response: Response, token: string) {
-    response.cookie('__access_token', token, {
+    response.cookie(accessTokenCookie, token, {
       httpOnly: true,
       sameSite: 'strict',
       path: '/',
@@ -89,8 +90,8 @@ export class AuthGuard implements CanActivate {
     const request: Request = context.switchToHttp().getRequest();
     const response: Response = context.switchToHttp().getResponse();
 
-    const accessToken = request?.cookies?.['__access_token'] || null;
-    const refreshToken = request?.cookies?.['__refresh_token'] || null;
+    const accessToken = request?.cookies?.[accessTokenCookie] || null;
+    const refreshToken = request?.cookies?.[refreshTokenCookie] || null;
     const storeSelectToken = request?.cookies?.['_store'] || null;
 
     if (!accessToken || !refreshToken)
@@ -126,8 +127,8 @@ export class AuthGuard implements CanActivate {
     const { role } = session;
     if (!role) this.DispareErrorMessage();
 
-    const isManager = !!(role === this.roles.managerRole);
-    const isClient = !!(role === this.roles.clientRole);
+    const isManager = !!(role === this.roles.managerRole && isManagerRoute);
+    const isClient = !!(role === this.roles.clientRole && isClientRoute);
     const isPrivateToAllRoles = !!(isClientRoute && isManagerRoute);
 
     const isInvalidRequest = !isManager && !isClient;

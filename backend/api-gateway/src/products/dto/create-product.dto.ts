@@ -13,7 +13,4 @@ export class CreateProductDto {
   @IsNumber()
   @IsOptional()
   quantity?: number = 0;
-
-  @IsString()
-  storeId: string;
 }

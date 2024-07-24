@@ -2,9 +2,9 @@ import { BadGatewayException, Injectable, Logger, UnauthorizedException } from '
 import { CreateStoreDto } from './dtos/create-store.dto';
 import { ProxyService } from 'src/proxy/proxy.service';
 import { _queueStores } from 'src/utils/queues';
-import { Store } from './entities/store.entity';
 import { Response } from 'express';
 import { AuthService } from 'src/auth/auth.service';
+import { UpdateStoreDto } from './dtos/update-store.dto';
 
 type SelectStoreAndSetInResponseProps = {
   response: Response;
@@ -18,36 +18,9 @@ export class StoresService {
 
   private readonly logger: Logger = new Logger(StoresService.name);
 
-  // async selectStore({
-  //   storeId,
-  //   response,
-  //   managerId,
-  // }: SelectStoreAndSetInResponseProps): Promise<Store> {
-  //   try {
-  //     const stores: Store[] = await this.findByManagerId(managerId);
-  //     if (!stores[0]?.id) throw new BadGatewayException('Nenhuma loja disponível!');
-
-  //     const selectedStore = stores?.filter((store: Store) => store.id === storeId)?.[0] || null;
-  //     if (!selectedStore?.id) throw new BadGatewayException('Loja não encontrada!');
-
-  //     const jwtStore: string = await this.authService.generateJwt();
-
-  //     response.cookie('__access_token', {
-  //       httpOnly: true,
-  //       sameSite: 'strict',
-  //       path: '/',
-  //     });
-
-  //     return selectedStore;
-  //   } catch (error) {
-  //     this.logger.error(error);
-  //     throw new BadGatewayException(error.message);
-  //   }
-  // }
-
-  async create(createStoreDto: CreateStoreDto, managerId: string): Promise<Store> {
+  public async create(createStoreDto: CreateStoreDto, managerId: string) {
     try {
-      const created: Store = await this.proxyService.sendMessage<Store>({
+      const created = await this.proxyService.sendMessage({
         queue: 'stores',
         pattern: 'create-store',
         data: {
@@ -63,7 +36,22 @@ export class StoresService {
     }
   }
 
-  async findStores(page: number): Promise<Store[]> {
+  public async update(updateStoreDto: UpdateStoreDto, managerId: string) {
+    try {
+      const stores = await this.proxyService.sendMessage({
+        data: { ...updateStoreDto, managerId },
+        pattern: 'update',
+        queue: 'stores',
+      });
+
+      return stores;
+    } catch (error) {
+      this.logger.error(error);
+      throw new BadGatewayException(error.message);
+    }
+  }
+
+  public async findStores(page: number) {
     try {
       const stores = await this.proxyService.sendMessage({
         queue: 'stores',
@@ -78,9 +66,9 @@ export class StoresService {
     }
   }
 
-  async findByManagerId(managerId: string): Promise<Store[]> {
+  public async findByManagerId(managerId: string) {
     try {
-      const find: Store[] = await this.proxyService.sendMessage({
+      const find = await this.proxyService.sendMessage({
         queue: 'stores',
         pattern: 'find-by-managerId',
         data: { managerId },

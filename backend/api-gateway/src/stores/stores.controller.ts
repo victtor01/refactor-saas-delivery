@@ -1,10 +1,10 @@
-import { Body, Controller, Get, Param, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Req } from '@nestjs/common';
 import { StoresService } from './stores.service';
 import { CreateStoreDto } from './dtos/create-store.dto';
-import { IsClient, IsManager } from 'src/utils/decorators';
-import { Session, SessionManager } from 'src/auth/constants';
+import { IsClient, IsManager, IsRequiredStore } from 'src/utils/decorators';
+import { Session, SessionManager, SessionStore } from 'src/auth/constants';
 import { FindStoresDto } from './dtos/find-stores.dto';
-import { Response } from 'express';
+import { UpdateStoreDto } from './dtos/update-store.dto';
 
 @Controller('stores')
 export class StoresController {
@@ -16,22 +16,18 @@ export class StoresController {
     return this.storesService.create(createStoreDto, manager.id);
   }
 
+  @Put()
+  @IsManager()
+  @IsRequiredStore()
+  update(@Req() { manager }: { manager: SessionManager }, @Body() { id, name }: UpdateStoreDto) {
+    return this.storesService.update({ id, name }, manager.id);
+  }
+
   @Get('my')
   @IsManager()
   MyStores(@Req() req: { manager: SessionManager }) {
     return this.storesService.findByManagerId(req.manager.id);
   }
-
-  // @Post('select')
-  // @IsManager()
-  // selectStore(
-  //   @Req() { manager }: { manager: SessionManager },
-  //   @Res({ passthrough: true }) response: Response,
-  //   @Body('storeId') storeId: string,
-  // ) {
-  //   const { id: managerId } = manager;
-  //   const store = this.storesService.selectStore({ storeId, managerId, response });
-  // }
 
   @Get('/:page?')
   @IsClient()

@@ -1,6 +1,6 @@
 import { Controller, HttpException, Logger } from '@nestjs/common';
 import { StoresService } from './stores.service';
-import { CreateStoreInterface } from './dto/create-store.dto';
+import { CreateStoreDto } from './dto/create-store.dto';
 import { ProxyService } from 'src/proxy/proxy.service';
 import {
   Ctx,
@@ -10,6 +10,7 @@ import {
   RpcException,
 } from '@nestjs/microservices';
 import { FindAllWithLimitDto } from './dto/find-store-with-limit.dto';
+import { Store } from './entities/store.entity';
 
 const errors = {
   queryError: 23502,
@@ -37,8 +38,8 @@ export class StoresController {
   }
 
   @MessagePattern('create-store')
-  async create(
-    @Payload() createStoreInterface: CreateStoreInterface,
+  public async create(
+    @Payload() createStoreInterface: CreateStoreDto,
     @Ctx() context: RmqContext,
   ) {
     try {
@@ -51,8 +52,19 @@ export class StoresController {
     }
   }
 
+  @MessagePattern('update')
+  public async update(@Ctx() context: RmqContext, @Payload() store: Store) {
+    try {
+      const stores = await this.storesService.update(store);
+
+      return stores;
+    } catch (error) {
+      this.rejectMessage(context, error);
+    }
+  }
+
   @MessagePattern('find-by-managerId')
-  async findByManagerId(
+  public async findByManagerId(
     @Ctx() context: RmqContext,
     @Payload('managerId') managerId: string,
   ) {
@@ -66,9 +78,9 @@ export class StoresController {
   }
 
   @MessagePattern('find-all')
-  async findByLimit(
+  public async findByLimit(
     @Ctx() context: RmqContext,
-    @Payload('page') page: number ,
+    @Payload('page') page: number,
   ) {
     try {
       const stores = await this.storesService.findWithLimit(page);
