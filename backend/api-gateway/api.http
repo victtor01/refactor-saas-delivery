@@ -52,7 +52,7 @@ Content-Type: application/json
 
 # @name stores
 POST {{HOST}}/stores HTTP/1.1
-Content-Type: applicati on/json
+Content-Type: application/json
 
 {
   "name": "minha loja"
@@ -72,18 +72,24 @@ Content-Type: application/json
   "id": "a63b601f-7a26-4ca8-a25b-b24d87390ac4",
   "name": "salgados!"
 }
-###
+###=
 
 # @name products
 GET {{HOST}}/products/mine HTTP/1.1
+###
+
+GET {{HOST}}/products/ HTTP/1.1
+###
+
+GET {{HOST}}/products/mine/0db687eb-d26e-49bb-bebe-8f48927f807b HTTP/1.1
 ###
 
 POST {{HOST}}/products HTTP/1.1
 Content-Type: application/json
 
 {
-  "name": "teste",
-  "description": "teste",
+  "name": "teste1",
+  "description": "teste1",
   "price": 10
 }
 ###

@@ -141,6 +141,7 @@ export class AuthService {
       return {
         accessToken,
         refreshToken,
+        email
       };
     } catch (error) {
       throw new BadRequestException(error.message);

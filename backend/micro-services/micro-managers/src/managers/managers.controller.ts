@@ -26,7 +26,8 @@ export class ManagersController {
   ) {
     try {
       const manager = await this.managersService.findOneByEmail(email);
-
+      this.proxyService.confirmMessage(context);
+      
       return manager;
     } catch (error) {
       this.logger.error('Error ao tentar criar Manager!', error);

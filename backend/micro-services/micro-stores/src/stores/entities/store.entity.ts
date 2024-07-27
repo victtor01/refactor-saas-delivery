@@ -1,6 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { CreateStoreDto } from '../dto/create-store.dto';
 import { randomUUID } from 'crypto';
+import { Optional } from '@nestjs/common';
 
 @Entity({ name: 'stores' })
 export class Store {
@@ -17,4 +18,7 @@ export class Store {
 
   @Column()
   managerId: string;
+
+  @Column({ nullable: true })
+  description?: string;
 }

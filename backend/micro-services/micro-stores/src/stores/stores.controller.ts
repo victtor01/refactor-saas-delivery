@@ -56,6 +56,7 @@ export class StoresController {
   public async update(@Ctx() context: RmqContext, @Payload() store: Store) {
     try {
       const stores = await this.storesService.update(store);
+      this.proxyService.confirmMessage(context);
 
       return stores;
     } catch (error) {
@@ -70,6 +71,7 @@ export class StoresController {
   ) {
     try {
       const stores = await this.storesService.findByManagerId(managerId);
+      this.proxyService.confirmMessage(context);
 
       return stores;
     } catch (error) {
@@ -84,6 +86,7 @@ export class StoresController {
   ) {
     try {
       const stores = await this.storesService.findWithLimit(page);
+      this.proxyService.confirmMessage(context);
 
       return stores;
     } catch (error) {

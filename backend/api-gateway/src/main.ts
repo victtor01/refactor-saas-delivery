@@ -20,6 +20,11 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.startAllMicroservices();
 
+  app.enableCors({
+    origin: ['http://localhost:3000'],
+    credentials: true,
+  })
+
   const logger = new Logger('MAIN');
 
   logger.debug('Iniciado a api-gateway')

@@ -11,12 +11,28 @@ export class ImplementsProductsRepository implements ProductsRepository {
     private readonly productRepository: Repository<Product>,
   ) {}
 
-  public async findByManagerAndStore(managerId: string, storeId: string): Promise<Product[]> {
+  public async findByManagerAndStore(
+    managerId: string,
+    storeId: string,
+  ): Promise<Product[]> {
     const products = await this.productRepository.find({
       where: { managerId, storeId },
     });
 
     return products;
+  }
+
+  public async findById(id: string): Promise<Product> {
+    const product = await this.productRepository.findOne({
+      where: { id },
+      relations: {
+        productTopics: {
+          topicOptions: true,
+        },
+      },
+    });
+
+    return product;
   }
 
   public async save(product: Product): Promise<Product> {

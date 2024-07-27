@@ -53,7 +53,7 @@ export class AuthController {
   @Public()
   @Post('managers')
   async auth(@Body() authManager: AuthDto, @Res({ passthrough: true }) response: Response) {
-    const { accessToken, refreshToken } = await this.authService.authManager(authManager);
+    const { accessToken, refreshToken, email } = await this.authService.authManager(authManager);
 
     try {
       response.cookie('__access_token', accessToken, {
@@ -71,6 +71,7 @@ export class AuthController {
       return {
         error: false,
         logged: true,
+        email: true,
       };
     } catch (error) {
       this.logger.error(error);

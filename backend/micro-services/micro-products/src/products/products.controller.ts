@@ -1,4 +1,10 @@
-import { Controller, ParseUUIDPipe } from '@nestjs/common';
+import {
+  BadGatewayException,
+  Controller,
+  Logger,
+  ParseUUIDPipe,
+  Req,
+} from '@nestjs/common';
 import {
   Ctx,
   MessagePattern,
@@ -9,6 +15,7 @@ import {
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ProxyService } from 'src/proxy/proxy.service';
+import { Product } from './entities/product.entity';
 
 @Controller()
 export class ProductsController {
@@ -17,17 +24,41 @@ export class ProductsController {
     private readonly proxyService: ProxyService,
   ) {}
 
+  private readonly logger: Logger = new Logger(ProductsController.name);
+
   @MessagePattern({ cmd: 'products', action: 'create' })
   public async create(
     @Payload() payload: CreateProductDto,
     @Ctx() context: RmqContext,
   ) {
-    const response = this.productsService.create(payload).catch((err) => {
-      this.proxyService.rejectMessage(context);
-      throw new RpcException(err);
-    });
+    try {
+      this.logger.debug('Criando novo produto...');
+      const response = this.productsService.create(payload);
+      this.proxyService.confirmMessage(context);
 
-    return response;
+      return response;
+    } catch (error) {
+      this.proxyService.rejectMessage(context);
+      this.logger.debug(error.message);
+      throw new RpcException(error.message);
+    }
+  }
+
+  @MessagePattern({ cmd: 'products', action: 'find-by-id' })
+  public async findById(
+    @Payload('productId') productId: string,
+    @Ctx() context: RmqContext,
+  ) {
+    try {
+      const response = this.productsService.findById(productId);
+      this.proxyService.confirmMessage(context);
+
+      return response;
+    } catch (error) {
+      this.proxyService.rejectMessage(context);
+      this.logger.debug(error.message);
+      throw new RpcException(error.message);
+    }
   }
 
   @MessagePattern({ cmd: 'products', action: 'find-by-managerId' })
@@ -35,14 +66,33 @@ export class ProductsController {
     @Payload('managerId') managerId: string,
     @Ctx() context: RmqContext,
   ) {
-    const response = this.productsService
-      .findByManagerId(managerId)
-      .catch((err: any) => {
-        this.proxyService.rejectMessage(context);
-        throw new RpcException(err);
-      });
+    try {
+      const response = this.productsService.findByManagerId(managerId);
+      this.proxyService.confirmMessage(context);
 
-    return response;
+      return response;
+    } catch (error) {
+      this.proxyService.rejectMessage(context);
+      this.logger.debug(error.message);
+      throw new RpcException(error.message);
+    }
+  }
+
+  @MessagePattern({ cmd: 'products', action: 'update' })
+  public async update(
+    @Payload() product: Product,
+    @Ctx() context: RmqContext,
+  ) {
+    try {
+      const updated = await this.productsService.update(product);
+      this.proxyService.confirmMessage(context);
+
+      return updated;
+    } catch (error) {
+      this.proxyService.rejectMessage(context);
+      this.logger.debug(error.message);
+      throw new RpcException(error.message);
+    }
   }
 
   @MessagePattern({ cmd: 'products', action: 'find-by-manager-and-store' })
@@ -57,9 +107,12 @@ export class ProductsController {
         storeId,
       );
 
+      this.proxyService.confirmMessage(context);
+
       return response;
     } catch (error) {
       this.proxyService.rejectMessage(context);
+      this.logger.debug(error.message);
       throw new RpcException(error.message);
     }
   }

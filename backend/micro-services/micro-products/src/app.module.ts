@@ -3,6 +3,8 @@ import { ProductsModule } from './products/products.module';
 import { ProxyModule } from './proxy/proxy.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CategoriesModule } from './categories/categories.module';
+import { ProductTopicsModule } from './product-topics/product-topics.module';
+import { TopicOptionsModule } from './topic-options/topic-options.module';
 
 @Module({
   imports: [ProductsModule, ProxyModule, 
@@ -16,7 +18,7 @@ import { CategoriesModule } from './categories/categories.module';
       entities: [__dirname + '/**/*.entity{.js,.ts}'],
       logging: false,
       synchronize: true,
-    }), CategoriesModule,
+    }), CategoriesModule, ProductTopicsModule, TopicOptionsModule,
   ],
   controllers: [],
   providers: [],
