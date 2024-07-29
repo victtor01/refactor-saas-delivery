@@ -20,7 +20,7 @@ export class ManagersController {
   private logger: Logger = new Logger(ManagersController.name);
   
   @MessagePattern('find-by-email')
-  async findByEmail(
+  public async findByEmail(
     @Payload('email') email: string,
     @Ctx() context: RmqContext,
   ) {
@@ -38,7 +38,7 @@ export class ManagersController {
   }
 
   @MessagePattern('create-manager')
-  async create(
+  public async create(
     @Payload() createManagerDto: CreateManagerDto,
     @Ctx() context: RmqContext,
   ) {

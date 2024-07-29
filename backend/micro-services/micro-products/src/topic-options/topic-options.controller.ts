@@ -7,4 +7,9 @@ import { UpdateTopicOptionDto } from './dto/update-topic-option.dto';
 @Controller()
 export class TopicOptionsController {
   constructor(private readonly topicOptionsService: TopicOptionsService) {}
+
+  @MessagePattern({ cmd: 'topicOptions', action: 'create' })
+  public async create() {
+    return;
+  }
 }

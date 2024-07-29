@@ -1,11 +1,16 @@
 import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
 import { CreateClientDto } from '../interfaces/create-client.interface';
 import { randomUUID } from 'crypto';
+import { BadRequestException } from '@nestjs/common';
 
 @Entity({ name: 'clients' })
 export class Client {
-  constructor(props: CreateClientDto, id?: string) {
-    Object.assign(this, props);
+  constructor({ firstName, lastName, email, password }: CreateClientDto, id?: string) {
+    if (!firstName || !lastName || !email || !password) {
+      throw new BadRequestException('parâmetros para criar um novo cliente inválidos!');
+    }
+
+    Object.assign(this, { firstName, lastName, email, password });
     this.id = id || randomUUID();
   }
 

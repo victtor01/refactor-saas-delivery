@@ -15,7 +15,7 @@ export class ManagersService {
 
   private hashPassword = (pass: string) => hash(pass, 10);
 
-  async findOneByEmail(email: string): Promise<ManagerEntity> {
+  public async findOneByEmail(email: string): Promise<ManagerEntity> {
     try {
       const manager = await this.managerRepo.findOneByEmail(email);
 
@@ -25,7 +25,7 @@ export class ManagersService {
     }
   }
 
-  async save(createManagerDto: CreateManagerDto): Promise<ManagerEntity> {
+  public async save(createManagerDto: CreateManagerDto): Promise<ManagerEntity> {
     const managerExists = await this.managerRepo.findOneByEmail(
       createManagerDto.email,
     );

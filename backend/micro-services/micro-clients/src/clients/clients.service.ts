@@ -16,9 +16,8 @@ export class ClientsService {
 
   private saltsHashPassoword = 10;
   private logger: Logger = new Logger(ClientsService.name);
-  private propsToCreateClientIsValid = (props: any) => !!(props instanceof Client);
 
-  async findByEmail(email: string): Promise<Client> {
+  public async findByEmail(email: string): Promise<Client> {
     try {
       const client = await this.clientsRepo.findByEmail(email);
       if (!client?.id) throw new NotFoundException('Usuário não existe!');
@@ -30,14 +29,8 @@ export class ClientsService {
     }
   }
 
-  async create(createClientDto: CreateClientDto): Promise<Client> {
+  public async create(createClientDto: CreateClientDto): Promise<Client> {
     const clientToCreate = new Client(createClientDto);
-
-    const propsIsValid = this.propsToCreateClientIsValid(clientToCreate);
-    if (!propsIsValid) {
-      this.logger.fatal('Erro ao criar um novo usuário: Propriedades inválidas!');
-      throw new BadRequestException('Propriedades para criar usuário estão incorretas!');
-    }
 
     const clientInDatabaseExists = await this.clientsRepo.findByEmail(clientToCreate.email);
     if (clientInDatabaseExists?.id) {

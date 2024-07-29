@@ -23,9 +23,9 @@ export class ProductsService {
     ...props
   }: CreateProductDto): Promise<Product> {
     const { name, description, price, storeId, managerId } = props;
-    if (!storeId || !managerId) {
+
+    if (!storeId || !managerId)
       throw new BadRequestException('Faltando argumentos!');
-    }
 
     try {
       const product = new Product({
@@ -36,9 +36,7 @@ export class ProductsService {
         name,
       });
 
-      const saved = await this.productsRepo.save({
-        ...product,
-      });
+      const saved = await this.productsRepo.save(product);
 
       return saved;
     } catch (error) {
