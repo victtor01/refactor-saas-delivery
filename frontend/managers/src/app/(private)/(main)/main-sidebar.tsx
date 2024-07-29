@@ -114,8 +114,8 @@ const MainSidebar = () => {
             {Object.entries(links).map(([name, { link, icon: Icon }]) => {
               const selectedLink = pathName.includes(link);
               const styleSelected = selectedLink
-                ? ""
-                : "hover:bg-zinc-200 dark:hover:bg-zinc-700 hover:bg-opacity-70 dark:hover:bg-opacity-30";
+                ? "bg-zinc-100 dark:bg-zinc-700 dark:bg-opacity-30 cursor-default pointer-events-none"
+                : "hover:bg-zinc-100 dark:hover:bg-zinc-700 hover:bg-opacity-70 dark:hover:bg-opacity-30";
               const color = selectedLink
                 ? "text-rose-600"
                 : "dark:text-gray-500";

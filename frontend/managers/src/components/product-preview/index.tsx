@@ -1,5 +1,6 @@
 import { Product } from "@/interfaces/product";
 import { getImageProduct } from "@/utils/getImageProduct";
+import { formatToBRL } from "@/utils/transformFloatInReal";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -55,8 +56,11 @@ export default function ProductPreview({
           >
             <span>{product?.name}</span>
 
-            <span className="p-1 px-2 text-orange-500 bg-orange-100 rounded-md">
-              {product?.price}
+            <span
+              className="p-1 px-3 text-orange-500 bg-orange-100 rounded
+            dark:text-white dark:bg-rose-600 font-normal text-sm"
+            >
+              {formatToBRL(Number(product?.price) || 0)}
             </span>
           </div>
 

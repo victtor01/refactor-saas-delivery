@@ -37,8 +37,6 @@ const useSession = () => {
 
     const session = await openSessionToken(sessionCookie);
 
-    console.log(session)
-    
     if (!session?.email || !session?.exp) return false;
 
     const currentDate = new Date().getTime();
