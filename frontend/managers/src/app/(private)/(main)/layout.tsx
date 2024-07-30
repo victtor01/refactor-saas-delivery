@@ -31,7 +31,9 @@ export default async function MainLayout({ children }: MainLayoutProps) {
         theme={theme}
         transition={Bounce}
       />
+
       <MainSidebar />
+      
       <section className="flex-col flex flex-1 overflow-auto">
         {children}
       </section>

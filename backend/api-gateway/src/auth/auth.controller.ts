@@ -1,9 +1,9 @@
-import { Controller, Post, Body, Req, Res, BadRequestException, Logger } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { IsManager, Public } from 'src/utils/decorators';
+import { BadRequestException, Body, Controller, Logger, Post, Req, Res } from '@nestjs/common';
 import { Response } from 'express';
-import { AuthDto } from './dtos/auth.dto';
+import { IsManager, Public } from 'src/utils/decorators';
+import { AuthService } from './auth.service';
 import { SessionManager } from './constants';
+import { AuthDto } from './dtos/auth.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -71,7 +71,7 @@ export class AuthController {
       return {
         error: false,
         logged: true,
-        email: true,
+        email,
       };
     } catch (error) {
       this.logger.error(error);

@@ -134,10 +134,11 @@ export class AuthService {
 
     try {
       const { id, email } = findOneManagerByEmail;
+      
       const payload: Session = { id, email, role: this.roles.managerRole };
-
+      
       const { accessToken, refreshToken } = await this.getAccessAndRefreshToken<Session>(payload);
-
+      
       return {
         accessToken,
         refreshToken,

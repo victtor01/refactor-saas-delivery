@@ -5,19 +5,20 @@ import { Product } from "@/interfaces/product";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { ProductsCreateModel } from "./products-create-model";
+import { ProductsCreateModel } from "../../../../components/products/products-create-model";
 import ProductPreview from "@/components/product-preview";
 import { useCategories } from "@/hooks/useCategories";
 import { ProductsHeader } from "./products-header";
 import { BiCategory } from "react-icons/bi";
 import { useEffect } from "react";
 import Squeleton from "./squeleton";
+import { ProductsCreateCategory } from "@/components/products/products-create-category";
 
-type Model = "create" | null;
+type Model = "create" | "create-category" | null;
 
 const useProducts = () => {
   const searchParams = useSearchParams();
-  const modelState: Model = searchParams.get("model") as Model;
+  const modelState: Model = (searchParams.get("model") as Model) || null;
   const categoryNameSelected: string | null =
     searchParams.get("category") || null;
 
@@ -60,6 +61,7 @@ export default function Products() {
   return (
     <>
       {modelState === "create" && <ProductsCreateModel />}
+      {modelState === "create-category" && <ProductsCreateCategory />}
 
       <div>
         <ProductsHeader />
@@ -71,12 +73,14 @@ export default function Products() {
 
         <div className="w-full p-2 px-6 flex gap-3">
           <Link
-            href={"?"}
-            className={`p-2 px-4 capitalize font-semibold rounded-md 
-            ${styleForNoCategorySelected}`}
+            className={`p-2 px-4 capitalize font-semibold rounded-md ${styleForNoCategorySelected}`}
+            href="?"
           >
             Todos
           </Link>
+
+          <Link href="?model=create-category">Criar</Link>
+
           {/* {!!categories &&
             categories?.map((category) => {
               const selected = categoryNameSelected === category.name;

@@ -1,19 +1,18 @@
 import {
+  Body,
   Controller,
   Get,
-  Post,
-  Body,
-  Req,
   Logger,
   Param,
-  BadGatewayException,
+  Post,
   Put,
+  Req,
 } from '@nestjs/common';
-import { ProductsService } from './products.service';
-import { CreateProductDto } from './dto/create-product.dto';
-import { IsClient, IsManager, IsRequiredStore } from 'src/utils/decorators';
 import { Session, SessionStore } from 'src/auth/constants';
+import { IsManager, IsRequiredStore } from 'src/utils/decorators';
+import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { ProductsService } from './products.service';
 
 @Controller('products')
 export class ProductsController {
@@ -27,18 +26,10 @@ export class ProductsController {
   public async getAllMyProducts(
     @Req() { manager, store }: { manager: Session; store: SessionStore },
   ) {
-    try {
-      const products =
-        await this.productsService.findAllMyProductsByManagerAndStore(
-          manager.id,
-          store.id,
-        );
-
-      return products;
-    } catch (error) {
-      this.logger.error('erro ao pegar produtos do manager!');
-      throw new BadGatewayException(error.message);
-    }
+    return await this.productsService.findAllMyProductsByManagerAndStore(
+      manager.id,
+      store.id,
+    );
   }
 
   @Get('/mine/:id')
@@ -47,16 +38,8 @@ export class ProductsController {
     @Param('id') id: string,
     @Req() { manager }: { manager: Session },
   ) {
-    try {
-      const product = await this.productsService.findProductByIdAndManager(
-        id,
-        manager.id,
-      );
-
-      return product;
-    } catch (error) {
-      throw new BadGatewayException(error.message);
-    }
+    const { id: managerId } = manager;
+    return await this.productsService.findProductByIdAndManager(id, managerId);
   }
 
   @Post()
@@ -66,16 +49,11 @@ export class ProductsController {
     @Body() createProductDto: CreateProductDto,
     @Req() { store, manager }: { store: SessionStore; manager: Session },
   ) {
-    try {
-      const products = this.productsService.create(
-        createProductDto,
-        store.id,
-        manager.id,
-      );
-      return products;
-    } catch (error) {
-      throw new BadGatewayException(error.message);
-    }
+    return await this.productsService.create(
+      createProductDto,
+      store.id,
+      manager.id,
+    );
   }
 
   @Put(':productId')
@@ -85,12 +63,10 @@ export class ProductsController {
     @Param('productId') productId: string,
     @Req() { manager }: { manager: Session },
   ) {
-    const updated = await this.productsService.update(
+    return await this.productsService.update(
       updateProductDto,
       productId,
       manager.id,
     );
-
-    return updated;
   }
 }

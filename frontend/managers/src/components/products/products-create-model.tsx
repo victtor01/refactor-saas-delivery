@@ -9,15 +9,13 @@ import { motion } from "framer-motion";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useFormState } from "react-dom";
 import { api } from "@/api";
 import { toast } from "react-toastify";
-import { QueryClient } from "@tanstack/react-query";
 import { queryClient } from "@/providers/query-client";
 import { Product } from "@/interfaces/product";
 import { useRouter } from "next/navigation";
 
-const schemaCreateProduct = z.object({
+export const schemaCreateProduct = z.object({
   name: z.string().min(3, "o mínimo para o nome do produto é 3 caracteres"),
   price: z
     .string()
@@ -40,13 +38,13 @@ const useCreateProduct = () => {
       const responseApi = api.post("/products", dataProduct);
 
       const createdProduct: Product =
-        (await (
+        (
           await toast.promise(responseApi, {
             pending: "Carregando...",
             success: "Criado com sucesso!",
             error: "Houve um erro, tente novamente mais tarde!",
           })
-        )?.data) || {};
+        )?.data || {};
 
       queryClient.setQueriesData(
         { queryKey: ["products"] },
@@ -54,8 +52,8 @@ const useCreateProduct = () => {
           return [...(prev || []), createdProduct];
         }
       );
-      
-      router.push('?')
+
+      router.push("?");
     } catch (error) {}
   };
 

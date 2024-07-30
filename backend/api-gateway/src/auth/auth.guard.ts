@@ -1,23 +1,30 @@
+import { Reflector } from '@nestjs/core';
+import { JwtService } from '@nestjs/jwt';
+import { Request, Response } from 'express';
+import { Roles } from 'src/utils/roles';
+import { Session } from './constants';
+
+import {
+  accessTokenCookie,
+  refreshTokenCookie,
+  storeTokenCookie,
+} from 'src/cookies';
+
 import {
   BadGatewayException,
   CanActivate,
   ExecutionContext,
   Injectable,
   Logger,
-  UnauthorizedException
+  UnauthorizedException,
 } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
-import { JwtService } from '@nestjs/jwt';
-import { Request, Response } from 'express';
-import { accessTokenCookie, refreshTokenCookie, storeTokenCookie } from 'src/cookies';
+
 import {
   IS_CLIENT,
   IS_MANAGER,
   IS_PUBLIC_KEY,
   IS_REQUIRED_STORE_SELECTED,
 } from 'src/utils/decorators';
-import { Roles } from 'src/utils/roles';
-import { Session } from './constants';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -30,20 +37,21 @@ export class AuthGuard implements CanActivate {
   private logger: Logger = new Logger(AuthGuard.name);
 
   private getContext(context: ExecutionContext) {
-    const isManagerRoute: boolean = this.reflector.getAllAndOverride<boolean>(IS_MANAGER, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
-
-    const isClientRoute: boolean = this.reflector.getAllAndOverride<boolean>(IS_CLIENT, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
-
-    const isRequiredStoreSelected: boolean = this.reflector.getAllAndOverride<boolean>(
-      IS_REQUIRED_STORE_SELECTED,
+    const isManagerRoute: boolean = this.reflector.getAllAndOverride<boolean>(
+      IS_MANAGER,
       [context.getHandler(), context.getClass()],
     );
+
+    const isClientRoute: boolean = this.reflector.getAllAndOverride<boolean>(
+      IS_CLIENT,
+      [context.getHandler(), context.getClass()],
+    );
+
+    const isRequiredStoreSelected: boolean =
+      this.reflector.getAllAndOverride<boolean>(IS_REQUIRED_STORE_SELECTED, [
+        context.getHandler(),
+        context.getClass(),
+      ]);
 
     return {
       isRequiredStoreSelected,
@@ -52,7 +60,7 @@ export class AuthGuard implements CanActivate {
     };
   }
 
-  private removeAllCookies (response: Response) {
+  private removeAllCookies(response: Response) {
     response.clearCookie(accessTokenCookie);
     response.clearCookie(refreshTokenCookie);
     response.clearCookie(storeTokenCookie);
@@ -86,10 +94,10 @@ export class AuthGuard implements CanActivate {
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const isPublic: boolean = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
+    const isPublic: boolean = this.reflector.getAllAndOverride<boolean>(
+      IS_PUBLIC_KEY,
+      [context.getHandler(), context.getClass()],
+    );
     if (isPublic) return true;
 
     const request: Request = context.switchToHttp().getRequest();
@@ -100,9 +108,12 @@ export class AuthGuard implements CanActivate {
     const storeSelectToken = request?.cookies?.['_store'] || null;
 
     if (!accessToken || !refreshToken)
-      throw new UnauthorizedException('Você não tem permissão para fazer isso!');
+      throw new UnauthorizedException(
+        'Você não tem permissão para fazer isso!',
+      );
 
-    const { isRequiredStoreSelected, isManagerRoute, isClientRoute } = this.getContext(context);
+    const { isRequiredStoreSelected, isManagerRoute, isClientRoute } =
+      this.getContext(context);
     if (!isManagerRoute && !isClientRoute) this.DispareErrorMessage();
 
     if (isRequiredStoreSelected) {
@@ -141,7 +152,9 @@ export class AuthGuard implements CanActivate {
     if (isInvalidRequest) this.DispareErrorMessage();
 
     const defaultRole = this?.roles?.defaultRole;
-    const userRole = (isPrivateToAllRoles ? defaultRole : role)?.toLocaleLowerCase();
+    const userRole = (
+      isPrivateToAllRoles ? defaultRole : role
+    )?.toLocaleLowerCase();
 
     request[userRole] = session;
 
