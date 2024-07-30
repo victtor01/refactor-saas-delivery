@@ -1,10 +1,10 @@
 import { Body, Controller, Get, Param, Post, Put, Req } from '@nestjs/common';
-import { StoresService } from './stores.service';
-import { CreateStoreDto } from './dtos/create-store.dto';
+import { Session, SessionManager } from 'src/auth/constants';
 import { IsClient, IsManager, IsRequiredStore } from 'src/utils/decorators';
-import { Session, SessionManager, SessionStore } from 'src/auth/constants';
+import { CreateStoreDto } from './dtos/create-store.dto';
 import { FindStoresDto } from './dtos/find-stores.dto';
 import { UpdateStoreDto } from './dtos/update-store.dto';
+import { StoresService } from './users-services';
 
 @Controller('stores')
 export class StoresController {

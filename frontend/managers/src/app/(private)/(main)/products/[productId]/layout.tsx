@@ -23,7 +23,7 @@ export default function Template({ children }: LayoutProps) {
       >
         <Link
           href="/products"
-          className={`flex items-center gap-2 p-1 px-3 
+          className={`flex items-center gap-2 p-1 px-3 dark:hover:bg-zinc-700 
           font-semibold text-orange-500 rounded hover:bg-gray-100
           ${fontInter}`}
         >

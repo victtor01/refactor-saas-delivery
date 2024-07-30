@@ -197,17 +197,15 @@ export default function ProductUpdate() {
     keyName: "key",
   });
 
-  console.table(topics);
-
-  const {
-    fields: categoriesInSchema,
-    append: addCategory,
-    remove: removeCategory,
-  } = useFieldArray({
-    control,
-    name: "categories",
-    keyName: "key",
-  });
+  // const {
+  //   fields: categoriesInSchema,
+  //   append: addCategory,
+  //   remove: removeCategory,
+  // } = useFieldArray({
+  //   control,
+  //   name: "categories",
+  //   keyName: "key",
+  // });
 
   if (isLoading || !model) return;
 
@@ -367,7 +365,8 @@ export default function ProductUpdate() {
                       </button>
                       <span
                         className={`w-10 h-10 rounded-md grid font-semibold
-                        place-items-center text-lg ${classStyle}`}
+                        place-items-center text-lg dark:bg-green-600
+                        dark:text-green-800 ${classStyle}`}
                       >
                         {field?.value}
                       </span>
@@ -415,10 +414,7 @@ export default function ProductUpdate() {
           dark:border-zinc-700 border-t mt-5 relative"
           >
             <div className="absolute top-0 left-[1.5rem] translate-y-[-50%]">
-              <span
-                className="rounded-md bg-gray-700 text-white
-              p-1 px-2 text-sm"
-              >
+              <span className="rounded-md bg-gray-700 text-white p-1 px-2 text-sm">
                 Categorias
               </span>
             </div>
@@ -479,11 +475,8 @@ export default function ProductUpdate() {
                         render={({ field }) => (
                           <input
                             {...field}
-                            className="font-semibold text-xl
-                            text-gray-600 dark:text-gray-200 
-                            bg-transparent rounded-lg flex-1
-                            outline-none focus:border-orange-500
-                            placeholder:font-normal"
+                            className="font-semibold text-xl text-gray-600 dark:text-gray-200 bg-transparent rounded-lg flex-1
+                            outline-none focus:border-orange-500 placeholder:font-normal"
                             placeholder="Que tal molho extra?"
                           />
                         )}
@@ -493,25 +486,15 @@ export default function ProductUpdate() {
                         onClick={() => {
                           removeTopic(indexOfTopic);
                         }}
-                        className="justify-center flex items-center gap-2 text-sm
-                      bg-rose-500 rounded-md hover:shadow-xl w-auto px-2 h-8
-                      opacity-90 hover:opacity-100 text-white"
+                        className="justify-center flex items-center gap-2 text-sm bg-rose-500 rounded-md 
+                        hover:shadow-xl w-auto px-2 h-8 opacity-90 hover:opacity-100 text-white"
                       >
                         <BiMinus />
                         Remover
                       </button>
                     </header>
 
-                    <section
-                      className="flex flex-col px-4 border-l-[0.2rem] border-gray-300
-                    dark:border-orange-700"
-                    >
-                      <OptionComponent
-                        nestIndex={indexOfTopic}
-                        control={control}
-                        register={register}
-                      />
-                    </section>
+                    <OptionComponent nestIndex={indexOfTopic} />
                   </section>
                 );
               })}
@@ -525,9 +508,9 @@ export default function ProductUpdate() {
                     topicOptions: [],
                   })
                 }
-                className="w-auto border-2 border-dashed p-3 text-gray-600 text-lg bg-white
-              rounded-xl mt-5 font-semibold flex items-center gap-4 justify-center opacity-80
-              hover:opacity-100 hover:border-gray-300 dark:border-zinc-600 dark:text-gray-300"
+                className="w-auto border-2 border-dashed p-3 text-gray-600 text-lg bg-white dark:bg-zinc-800
+                rounded-xl mt-5 font-semibold flex items-center gap-4 justify-center opacity-80
+                hover:opacity-100 hover:border-gray-300 dark:border-zinc-600 dark:text-gray-300"
               >
                 <PiPlus />
                 Criar um novo tópico
@@ -535,20 +518,23 @@ export default function ProductUpdate() {
             </div>
           </section>
 
-          <footer className="flex p-[1rem] border-t gap-3 justify-between">
+          <footer
+            className="flex p-[1rem] border-t gap-3 justify-between
+          dark:border-gray-600"
+          >
             <button
               type="submit"
               className="p-2 px-5 text-white
-            rounded-md opacity-95 hover:opacity-100 
-            bg-red-600 hover:shadow-xl"
+              rounded-md opacity-95 hover:opacity-100 
+              bg-red-600 hover:shadow-xl"
             >
               Cancelar
             </button>
             <button
               type="submit"
               className="p-2 px-5 text-white
-            rounded-md opacity-95 hover:opacity-100 
-            bg-gray-700 hover:shadow-xl"
+              rounded-md opacity-95 hover:opacity-100 
+              bg-gray-700 hover:shadow-xl"
             >
               Atualizar
             </button>

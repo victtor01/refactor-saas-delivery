@@ -1,12 +1,11 @@
 import { Module } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
-import { JwtConfig } from './constants';
-import { ManagersModule } from 'src/managers/managers.module';
 import { ClientsModule } from 'src/clients/clients.module';
-import { StoresService } from 'src/stores/stores.service';
+import { ManagersModule } from 'src/managers/managers.module';
 import { StoresModule } from 'src/stores/stores.module';
+import { AuthController } from './auth.controller';
+import { AuthService } from './auth.service';
+import { JwtConfig } from './constants';
 
 const configJWT: JwtConfig = new JwtConfig();
 

@@ -6,15 +6,15 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { JwtConfig, Session } from './constants';
 import { JwtService } from '@nestjs/jwt';
-import { ManagersService } from 'src/managers/managers.service';
 import { compare as compareHash } from 'bcryptjs';
-import { Roles } from 'src/utils/roles';
 import { Response } from 'express';
-import { AuthDto } from './dtos/auth.dto';
 import { ClientsService } from 'src/clients/clients.service';
-import { StoresService } from 'src/stores/stores.service';
+import { ManagersService } from 'src/managers/managers.service';
+import { StoresService } from 'src/stores/users-services';
+import { Roles } from 'src/utils/roles';
+import { JwtConfig, Session } from './constants';
+import { AuthDto } from './dtos/auth.dto';
 
 type OptionsToGenerateJwt = {
   payload: any;

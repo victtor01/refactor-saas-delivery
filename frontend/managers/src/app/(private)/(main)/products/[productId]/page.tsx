@@ -11,12 +11,13 @@ import Image from "next/image";
 import { FaArrowTrendUp } from "react-icons/fa6";
 import { ProductTopic } from "@/interfaces/product-topic";
 import { Category } from "@/interfaces/category";
+import { TopicsComponent } from "./topics";
 
-interface ProductProps {
+type ProductProps = {
   params: {
     productId: string;
   };
-}
+};
 
 const useProduct = (productId: string) => {
   const { data: product } = useQuery<Product>({
@@ -31,39 +32,6 @@ const useProduct = (productId: string) => {
   };
 };
 
-const TopicsComponent = ({ topic }: { topic: ProductTopic }) => {
-  return (
-    <div key={topic.id} className="flex flex-col gap-1 w-auto p-2 rounded">
-      <header className="flex justify-between w-auto items-center">
-        <h1 className="font-semibold text-xl text-gray-600 dark:text-gray-200">
-          {topic.name}
-        </h1>
-      </header>
-
-      <div className="flex flex-col gap-2 pl-2 border-l-[0.2rem] ml-1 border-gray-300 dark:border-zinc-700">
-        {topic?.topicOptions?.length === 0 && (
-          <div className="font-semibold">Nenhuma opção adicionada</div>
-        )}
-        {topic?.topicOptions?.map((option) => {
-          return (
-            <div
-              key={option.id}
-              className="flex gap-3 items-center justify-between hover:bg-zinc-100 dark:hover:bg-zinc-700 dark:hover:bg-opacity-40 bg-opacity-50 p-1 pl-3 cursor-default"
-            >
-              <span className="font-semibold text-gray-500 dark:text-gray-200 capitalize text-lg">
-                {option?.name}
-              </span>
-              <span className="px-3 p-1 bg-green-600 text-white dark:text-emerald-900">
-                R$ {option?.price}
-              </span>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-};
-
 export default function ProductInformations({ params }: ProductProps) {
   const { productId } = params;
   const { product } = useProduct(productId);
@@ -71,7 +39,7 @@ export default function ProductInformations({ params }: ProductProps) {
 
   return (
     <section
-      className="flex mx-auto bg-white w-full max-w-[70rem]
+      className="flex mx-auto bg-white w-full max-w-[50rem]
       flex-col border overflow-auto dark:border-zinc-700
       dark:bg-zinc-800 my-auto rounded gap-4 m-10"
     >
@@ -97,8 +65,7 @@ export default function ProductInformations({ params }: ProductProps) {
                 style={{ objectFit: "cover" }}
                 layout="fill"
                 sizes="(max-width: 768px) 2rem,
-                      (max-width: 1200px) 2rem,
-                      33vw"
+                (max-width: 1200px) 2rem, 33vw"
               />
             )}
           </div>
@@ -122,10 +89,7 @@ export default function ProductInformations({ params }: ProductProps) {
           flex-wrap gap-3 *:whitespace-nowrap px-8 mt-5"
         >
           <div className="flex flex-col gap-1">
-            <span
-              className="flex items-center w-full gap-2 font-semibold 
-                text-gray-500 text-md dark:text-gray-300"
-            >
+            <span className="flex items-center w-full gap-2 font-semibold  text-gray-500 text-md dark:text-gray-300">
               <MdDriveFileRenameOutline size={17} />
               Nome
             </span>

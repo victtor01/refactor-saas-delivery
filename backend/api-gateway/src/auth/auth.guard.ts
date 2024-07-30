@@ -1,24 +1,23 @@
 import {
   BadGatewayException,
-  BadRequestException,
   CanActivate,
   ExecutionContext,
   Injectable,
   Logger,
-  UnauthorizedException,
+  UnauthorizedException
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Request, Response } from 'express';
+import { accessTokenCookie, refreshTokenCookie, storeTokenCookie } from 'src/cookies';
 import {
   IS_CLIENT,
   IS_MANAGER,
   IS_PUBLIC_KEY,
   IS_REQUIRED_STORE_SELECTED,
 } from 'src/utils/decorators';
-import { Session } from './constants';
 import { Roles } from 'src/utils/roles';
-import { accessTokenCookie, refreshTokenCookie } from 'src/cookies';
+import { Session } from './constants';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -51,6 +50,12 @@ export class AuthGuard implements CanActivate {
       isManagerRoute,
       isClientRoute,
     };
+  }
+
+  private removeAllCookies (response: Response) {
+    response.clearCookie(accessTokenCookie);
+    response.clearCookie(refreshTokenCookie);
+    response.clearCookie(storeTokenCookie);
   }
 
   private async renewTokenWithPassportOrError(refreshToken: string) {
@@ -121,6 +126,7 @@ export class AuthGuard implements CanActivate {
       })
       .catch((err) => {
         this.logger.error(err.message);
+        this.removeAllCookies(response);
         throw new BadGatewayException('Sessão expirada!');
       });
 
