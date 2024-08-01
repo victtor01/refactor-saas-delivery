@@ -15,21 +15,41 @@ export class ProductsCategoriesService {
 
   private logger: Logger = new Logger(ProductsCategoriesService.name);
 
-  public async create({ data: createCategoryDto, storeId, managerId }: CreateCategoryProps) {
+  public async create({
+    data: createCategoryDto,
+    storeId,
+    managerId,
+  }: CreateCategoryProps) {
     try {
+      const { name } = createCategoryDto;
       const created = await this.proxyService.sendMessage({
         queue: _queueProducts,
         pattern: { cmd: 'categories', action: 'create' },
         data: {
-          name: createCategoryDto.name,
+          name,
+          managerId,
           storeId,
-          managerId
         },
       });
 
       return created;
     } catch (error) {
       this.logger.error('Houve um erro ao tentar criar uma nova categoria!');
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  public async findCategoriesByStore(storeId: string) {
+    try {
+      const categories = await this.proxyService.sendMessage({
+        queue: _queueProducts,
+        pattern: { cmd: 'categories', action: 'find-by-store' },
+        data: { managerId: storeId },
+      });
+
+      return categories;
+    } catch (error) {
+      this.logger.error('Erro ao tentar buscar categorias', error);
       throw new BadRequestException(error.message);
     }
   }

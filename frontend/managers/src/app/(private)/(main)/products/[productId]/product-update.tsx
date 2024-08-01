@@ -1,38 +1,35 @@
-"use client";
+'use client';
 
-import React from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { api } from "@/api";
-import { Product } from "@/interfaces/product";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery } from "@tanstack/react-query";
-import { useParams, useSearchParams } from "next/navigation";
+import { api } from '@/api';
+import { Product } from '@/interfaces/product';
+import { queryClient } from '@/providers/query-client';
+import { getImageProduct } from '@/utils/getImageProduct';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useQuery } from '@tanstack/react-query';
+import { motion } from 'framer-motion';
+import React from 'react';
 import {
-  Control,
   Controller,
   FormProvider,
-  UseFormRegister,
   useFieldArray,
   useForm,
-} from "react-hook-form";
-import { IoMdPhotos, IoMdPricetag } from "react-icons/io";
-import { MdDriveFileRenameOutline } from "react-icons/md";
-import { VscListFlat } from "react-icons/vsc";
-import { motion } from "framer-motion";
-import { IoClose } from "react-icons/io5";
-import { queryClient } from "@/providers/query-client";
-import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
-import { getImageProduct } from "@/utils/getImageProduct";
-import { PiPlus } from "react-icons/pi";
-import { BiMinus } from "react-icons/bi";
-import { z } from "zod";
-import { useCategories } from "@/hooks/useCategories";
-import { Category } from "@/interfaces/category";
-import { OptionComponent } from "./option";
+} from 'react-hook-form';
+import { toast } from 'react-toastify';
+import { z } from 'zod';
 
-const CONDITION_TO_NULL_PHOTO = "NOTFOUND";
+import Image from 'next/image';
+import Link from 'next/link';
+import { useParams, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+
+import { BiMinus } from 'react-icons/bi';
+import { IoMdPricetag } from 'react-icons/io';
+import { IoClose } from 'react-icons/io5';
+import { MdDriveFileRenameOutline } from 'react-icons/md';
+import { PiPlus } from 'react-icons/pi';
+import { VscListFlat } from 'react-icons/vsc';
+
+import { OptionComponent } from './option';
 
 type ParamProps = {
   [key: string]: string;
@@ -40,7 +37,7 @@ type ParamProps = {
 
 const schemaUpdateProduct = z.object({
   // photo: z.unknown().transform((value) => value as FileList | undefined),
-  name: z.string().min(3, "o mínimo para o nome do produto é 3 caracteres"),
+  name: z.string().min(3, 'o mínimo para o nome do produto é 3 caracteres'),
   quantity: z
     .number()
     .transform((value) => {
@@ -50,15 +47,15 @@ const schemaUpdateProduct = z.object({
     .default(0),
   price: z
     .string()
-    .min(1, "Você deve colocar um valor acima de R$ 0,00")
-    .max(7, "O máximo é 9999.99"),
+    .min(1, 'Você deve colocar um valor acima de R$ 0,00')
+    .max(7, 'O máximo é 9999.99'),
   description: z.string(),
   categories: z
     .array(
       z.object({
         id: z.string(),
         name: z.string(),
-      })
+      }),
     )
     .optional(),
   topics: z.array(
@@ -70,9 +67,9 @@ const schemaUpdateProduct = z.object({
           id: z.string().nullable(),
           name: z.string(),
           price: z.string(),
-        })
+        }),
       ),
-    })
+    }),
   ),
 });
 
@@ -80,10 +77,10 @@ type UpdateProductProps = z.infer<typeof schemaUpdateProduct>;
 
 const useProduct = (productId: string) => {
   const searchParams = useSearchParams();
-  const model: boolean = !!(searchParams.get("model") === "update");
+  const model: boolean = !!(searchParams.get('model') === 'update');
 
   const { data: product, isLoading } = useQuery<Product>({
-    queryKey: ["products", productId],
+    queryKey: ['products', productId],
     queryFn: async () => {
       return (await api.get(`/products/${productId}`)).data;
     },
@@ -110,26 +107,26 @@ const useProduct = (productId: string) => {
       const response = api.put(`/products/${productId}`, newData);
 
       await Promise.all([
-        queryClient.setQueryData(["products", productId], () => ({
+        queryClient.setQueryData(['products', productId], () => ({
           ...newData,
         })),
-        queryClient.setQueryData(["products"], (prev: any) => {
+        queryClient.setQueryData(['products'], (prev: any) => {
           if (!prev) return [newData];
 
           return prev?.map((product: any) =>
-            product.id === productId ? newData : product
+            product.id === productId ? newData : product,
           );
         }),
       ]);
 
       await toast.promise(response, {
-        pending: "Atualizado...",
-        success: "Atualizado com sucesso!",
+        pending: 'Atualizado...',
+        success: 'Atualizado com sucesso!',
       });
     } catch (error) {
-      toast.error("Houve um erro ao tentar atualizar os dados!");
+      toast.error('Houve um erro ao tentar atualizar os dados!');
     } finally {
-      push("?");
+      push('?');
     }
   };
 
@@ -178,7 +175,7 @@ export default function ProductUpdate() {
 
   if (!productId) {
     throw new Error(
-      "Houve um erro ao tentar encontrar o id do produto solicitado!"
+      'Houve um erro ao tentar encontrar o id do produto solicitado!',
     );
   }
 
@@ -193,8 +190,8 @@ export default function ProductUpdate() {
     fields: topics,
   } = useFieldArray({
     control,
-    name: "topics",
-    keyName: "key",
+    name: 'topics',
+    keyName: 'key',
   });
 
   // const {
@@ -214,7 +211,7 @@ export default function ProductUpdate() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0, transition: { duration: 0 } }}
-      transition={{ duration: 0.5, type: "spring" }}
+      transition={{ duration: 0.5, type: 'spring' }}
       className="fixed top-0 left-0 z-50 shadow-xl overflow-auto p-10
       bg-zinc-900 w-full h-screen flex bg-opacity-50 dark:shadow-black"
     >
@@ -223,7 +220,7 @@ export default function ProductUpdate() {
           initial={{ y: 50 }}
           animate={{ y: 0 }}
           exit={{ y: -50 }}
-          transition={{ duration: 0.5, type: "spring" }}
+          transition={{ duration: 0.5, type: 'spring' }}
           className="w-full max-w-[45rem] h-auto m-auto shadow-2xl
         rounded-2xl flex flex-col gap-3 bg-gray-50 dark:bg-zinc-800
         border border-transparent dark:border-zinc-700"
@@ -235,7 +232,7 @@ export default function ProductUpdate() {
             </h1>
 
             <Link
-              href={"?"}
+              href={'?'}
               className="p-3 bg-white shadow rounded-full dark:bg-zinc-700 
             hover:opacity-100 opacity-90 hover:shadow-xl"
             >
@@ -255,7 +252,7 @@ export default function ProductUpdate() {
                     quality={25}
                     alt="imagem do produto"
                     src={imagePreview}
-                    style={{ objectFit: "cover" }}
+                    style={{ objectFit: 'cover' }}
                     layout="fill"
                     sizes="(max-width: 768px) 2rem,
                 (max-width: 1200px) 2rem,
@@ -296,7 +293,7 @@ export default function ProductUpdate() {
                 Nome
               </span>
               <input
-                {...register("name")}
+                {...register('name')}
                 type="text"
                 placeholder="Produto01"
                 className="p-2 transparent border-2 border-transparent 
@@ -319,7 +316,7 @@ export default function ProductUpdate() {
                 Preço
               </span>
               <input
-                {...register("price")}
+                {...register('price')}
                 maxLength={7}
                 type="text"
                 placeholder="19.90"
@@ -348,8 +345,8 @@ export default function ProductUpdate() {
                 render={({ field }) => {
                   const classStyle =
                     field?.value > 0
-                      ? "bg-green-100 text-emerald-600 dark:bg-emerald dark:text-white"
-                      : "bg-red-100 text-red-600";
+                      ? 'bg-green-100 text-emerald-600 dark:bg-emerald dark:text-white'
+                      : 'bg-red-100 text-red-600';
                   return (
                     <div className="flex gap-2 items-center">
                       <button
@@ -399,7 +396,7 @@ export default function ProductUpdate() {
                 Descrição
               </span>
               <textarea
-                {...register("description")}
+                {...register('description')}
                 placeholder="Produto01"
                 className="transparent outline-none resize-none
               p-2 rounded-md border-2 border-transparent bg-white shadow
@@ -504,7 +501,7 @@ export default function ProductUpdate() {
                 onClick={() =>
                   addNewTopic({
                     id: null,
-                    name: "",
+                    name: '',
                     topicOptions: [],
                   })
                 }

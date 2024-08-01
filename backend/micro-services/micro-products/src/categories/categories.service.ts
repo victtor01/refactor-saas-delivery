@@ -12,4 +12,10 @@ export class CategoriesService {
 
     return saved;
   }
+
+  public async findByStoreId(storeId: string): Promise<Category[]> {
+    const stores = await this.categoriesRepo.findByStore(storeId);
+
+    return stores
+  }
 }

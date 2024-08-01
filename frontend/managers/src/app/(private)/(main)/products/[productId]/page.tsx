@@ -1,17 +1,20 @@
-"use client";
+'use client';
 
-import { useQuery } from "@tanstack/react-query";
-import { Product } from "@/interfaces/product";
-import { api } from "@/api";
-import { VscListFlat } from "react-icons/vsc";
-import { MdDriveFileRenameOutline } from "react-icons/md";
-import { IoMdCart, IoMdPricetag } from "react-icons/io";
-import { getImageProduct } from "@/utils/getImageProduct";
-import Image from "next/image";
-import { FaArrowTrendUp } from "react-icons/fa6";
-import { ProductTopic } from "@/interfaces/product-topic";
-import { Category } from "@/interfaces/category";
-import { TopicsComponent } from "./topics";
+import { api } from '@/api';
+import { Category } from '@/interfaces/category';
+import { Product } from '@/interfaces/product';
+import { ProductTopic } from '@/interfaces/product-topic';
+import { getImageProduct } from '@/utils/getImageProduct';
+import { useQuery } from '@tanstack/react-query';
+
+import Image from 'next/image';
+
+import { FaArrowTrendUp } from 'react-icons/fa6';
+import { IoMdCart, IoMdPricetag } from 'react-icons/io';
+import { MdDriveFileRenameOutline } from 'react-icons/md';
+import { VscListFlat } from 'react-icons/vsc';
+
+import { TopicsComponent } from './topics';
 
 type ProductProps = {
   params: {
@@ -21,7 +24,7 @@ type ProductProps = {
 
 const useProduct = (productId: string) => {
   const { data: product } = useQuery<Product>({
-    queryKey: ["products", productId],
+    queryKey: ['products', productId],
     queryFn: async () => {
       return (await api.get(`/products/mine/${productId}`)).data;
     },
@@ -62,7 +65,7 @@ export default function ProductInformations({ params }: ProductProps) {
                 quality={20}
                 alt="imagem do produto"
                 src={imagePreview}
-                style={{ objectFit: "cover" }}
+                style={{ objectFit: 'cover' }}
                 layout="fill"
                 sizes="(max-width: 768px) 2rem,
                 (max-width: 1200px) 2rem, 33vw"
@@ -79,7 +82,7 @@ export default function ProductInformations({ params }: ProductProps) {
               className="text-lg font-semibold text-zinc-700 
                 capitalize dark:text-zinc-100"
             >
-              {product?.description || "Sem descrição."}
+              {product?.description || 'Sem descrição.'}
             </span>
           </div>
         </section>
@@ -175,10 +178,7 @@ export default function ProductInformations({ params }: ProductProps) {
           </div>
         </section>
 
-        <footer
-          className="w-full border-t p-8 px-8 dark:border-gray-700
-          relative"
-        >
+        <footer className="w-full border-t p-8 px-8 dark:border-gray-700 relative">
           <div className="absolute top-0 left-[2rem] translate-y-[-50%]">
             <span className="rounded-md bg-gray-700 text-white p-1 px-2 text-sm">
               Outras opções

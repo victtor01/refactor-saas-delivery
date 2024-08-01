@@ -4,6 +4,7 @@ import {
   MessagePattern,
   Payload,
   RmqContext,
+  RpcException,
 } from '@nestjs/microservices';
 import { ProxyService } from 'src/proxy/proxy.service';
 import { CategoriesService } from './categories.service';
@@ -17,17 +18,34 @@ export class CategoriesController {
   ) {}
 
   @MessagePattern({ cmd: 'categories', action: 'create' })
-  async create(
+  public async create(
     @Payload() createCategoryDto: CreateCategoryDto,
     @Ctx() context: RmqContext,
   ) {
     try {
       const created = await this.categoriesService.create(createCategoryDto);
       this.proxyService.confirmMessage(context);
-      
+
       return created;
     } catch (error) {
       this.proxyService.rejectMessage(context);
+      throw new RpcException(error.message);
+    }
+  }
+
+  @MessagePattern({ cmd: 'categories', action: 'find-by-store' })
+  public async findByStoreId(
+    @Payload() { storeId }: { storeId: string },
+    @Ctx() context: RmqContext,
+  ) {
+    try {
+      const created = await this.categoriesService.findByStoreId(storeId);
+      this.proxyService.confirmMessage(context);
+
+      return created;
+    } catch (error) {
+      this.proxyService.rejectMessage(context);
+      throw new RpcException(error.message);
     }
   }
 }
