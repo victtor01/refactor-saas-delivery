@@ -15,7 +15,7 @@ export default async function MainLayout({ children }: MainLayoutProps) {
 
   return (
     <main
-      className="bg-gray-100 bg-opacity-50 dark:bg-zinc-900 w-full h-screen 
+      className="bg-gray-100 bg-opacity-60 dark:bg-zinc-900 w-full h-screen 
       overflow-auto flex dark:bg-opacity-60 dark:from-zinc-900 dark:to-zinc-900"
     >
       <ToastContainer

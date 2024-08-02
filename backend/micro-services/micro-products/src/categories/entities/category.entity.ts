@@ -17,6 +17,9 @@ export class Category {
   @Column()
   storeId: string;
 
+  @Column()
+  managerId: string;
+
   constructor(props: CreateCategoryDto) {
     this.id = randomUUID();
     Object.assign(this, props);

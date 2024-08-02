@@ -20,6 +20,20 @@ export class ProductsController {
 
   private logger: Logger = new Logger(ProductsController.name);
 
+  @Post()
+  @IsManager()
+  @IsRequiredStore()
+  public async create(
+    @Body() createProductDto: CreateProductDto,
+    @Req() { store, manager }: { store: SessionStore; manager: Session },
+  ) {
+    return await this.productsService.create(
+      createProductDto,
+      store.id,
+      manager.id,
+    );
+  }
+  
   @Get('mine')
   @IsManager()
   @IsRequiredStore()
@@ -42,18 +56,13 @@ export class ProductsController {
     return await this.productsService.findProductByIdAndManager(id, managerId);
   }
 
-  @Post()
+  @Get("/mine/filter-category/:categoryId?")
   @IsManager()
-  @IsRequiredStore()
-  public async create(
-    @Body() createProductDto: CreateProductDto,
-    @Req() { store, manager }: { store: SessionStore; manager: Session },
+  public async findByCategory(
+    @Param('categoryId') categoryId: string,
+    @Req() { manager }: { manager: Session }
   ) {
-    return await this.productsService.create(
-      createProductDto,
-      store.id,
-      manager.id,
-    );
+    
   }
 
   @Put(':productId')

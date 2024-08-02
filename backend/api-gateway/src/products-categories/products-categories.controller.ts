@@ -1,8 +1,9 @@
-import { Body, Controller, Get, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Req } from '@nestjs/common';
 import { Session, SessionStore } from 'src/auth/constants';
 import { IsManager, IsRequiredStore } from 'src/utils/decorators';
 import { CreateProductsCategoryDto } from './dto/create-products-category.dto';
 import { ProductsCategoriesService } from './products-categories.service';
+import { UpdateProductsCategoryDto } from './dto/update-products-category.dto';
 
 @Controller('/products/categories')
 export class ProductsCategoriesController {
@@ -30,5 +31,16 @@ export class ProductsCategoriesController {
   findMyCategories(@Req() { store }: { store: Session }) {
     const { id: storeId } = store;
     return this.productsCategoriesService.findCategoriesByStore(storeId);
+  }
+
+  @Put(':categoryId')
+  @IsManager()
+  update(
+    @Req() { manager }: { manager: Session },
+    @Body() body: UpdateProductsCategoryDto,
+    @Param('categoryId') categoryId: string,
+  ) {
+    const payload = { ...body, id: categoryId };
+    return this.productsCategoriesService.updateCategory(payload, manager.id);
   }
 }

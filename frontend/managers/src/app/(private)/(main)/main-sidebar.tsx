@@ -33,7 +33,7 @@ const StatusStore = () => {
   const { store } = useStore().useCookies();
 
   return (
-    <div className="w-full p-2 py-5 opacity-90 hover:opacity-100 cursor-default">
+    <div className="w-full p-4 opacity-90 hover:opacity-100 cursor-default">
       <section className="flex flex-col bg-zinc-200 dark:bg-zinc-900 bg-opacity-40 rounded shadow-3d-dark p-4 gap-4 border-orange-500">
         <header className="flex gap-2 overflow-hidden items-center">
           <div className="min-w-10 h-10 bg-zinc-700 rounded-full"></div>
@@ -130,9 +130,9 @@ const MainSidebar = () => {
                   <AnimatePresence>
                     {selectedLink && (
                       <motion.span
-                        className="flex bg-rose-600 absolute w-1 rounded-full left-0"
+                        className="flex bg-rose-600 absolute w-1 rounded-full left-2"
                         initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "50%", opacity: 1 }}
+                        animate={{ height: "40%", opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
                       />
                     )}

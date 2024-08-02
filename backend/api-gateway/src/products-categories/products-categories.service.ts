@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ProxyService } from 'src/proxy/proxy.service';
 import { _queueProducts } from 'src/utils/queues';
 import { CreateProductsCategoryDto } from './dto/create-products-category.dto';
+import { UpdateProductsCategoryDto } from './dto/update-products-category.dto';
 
 type CreateCategoryProps = {
   data: CreateProductsCategoryDto;
@@ -16,9 +17,9 @@ export class ProductsCategoriesService {
   private logger: Logger = new Logger(ProductsCategoriesService.name);
 
   public async create({
-    data: createCategoryDto,
     storeId,
     managerId,
+    data: createCategoryDto,
   }: CreateCategoryProps) {
     try {
       const { name } = createCategoryDto;
@@ -50,6 +51,29 @@ export class ProductsCategoriesService {
       return categories;
     } catch (error) {
       this.logger.error('Erro ao tentar buscar categorias', error);
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  public async updateCategory(
+    updateCategoryDto: UpdateProductsCategoryDto,
+    managerId: string,
+  ) {
+    try {
+      const { id, name } = updateCategoryDto;
+      const categories = await this.proxyService.sendMessage({
+        queue: _queueProducts,
+        pattern: { cmd: 'categories', action: 'update' },
+        data: {
+          managerId,
+          name,
+          id,
+        },
+      });
+
+      return categories;
+    } catch (error) {
+      this.logger.error('Erro ao tentar atualizar categoria!', error);
       throw new BadRequestException(error.message);
     }
   }
